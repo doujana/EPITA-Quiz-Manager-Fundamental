@@ -1,0 +1,33 @@
+create table QuestionType(id bigint auto_increment,title varchar(255));
+create table Question(id bigint auto_increment,title varchar(255),question_type_id  bigint );
+create table Quiz(id bigint auto_increment,NAME varchar(255));
+ALTER TABLE Question
+    ADD FOREIGN KEY (question_type_id) 
+    REFERENCES QuestionType(id)
+alter table Quiz add foreign key (question_id  ) references Question(id)
+alter table Quiz add foreign key  (student_id  ) references Student(id)
+create table student(id bigint auto_increment,name varchar(255));
+create table QuestionTopic(id bigint auto_increment,name varchar(255));
+alter table QuestionTopic add foreign key( question_id  ) references Question(id)
+create table StudentAnswer(id bigint auto_increment ,valid_answer_id bigint,mscq_answer_id bigint);
+create table MCQchoise(id bigint auto_increment,title varchar(255),question_id bigint);
+create table MCQAnswer(id bigint auto_increment,title varchar(255),mcqchoice_id bigint)*/
+create table ValidAnswer(id bigint auto_increment,name varchar(255))
+create table QUESTIONTYPE(id bigint auto_increment,name varchar(255))
+alter table studentanswer add foreign key (valid_answer_id ) references validanswer(id);
+alter table studentanswer add foreign key (mscq_answer_id ) references MCQAnswer(id);
+alter table studentanswer add foreign key (student_id ) references student(id);
+alter table mcqchoise add foreign key (question_id ) references question(id);
+alter table mcqanswer add foreign key (mcqchoice_id ) references mcqchoise (id);
+alter table Question add foreign key (topic_id  ) references Question(id)
+alter table question add column difficulty_id bigint;
+alter table question add foreign key (difficulty_id ) references difficulty(id);
+CREATE TABLE DIFFICULTY (ID BIGINT NOT NULL, DIFFICULTY_LEVEL VARCHAR(45), PRIMARY KEY (ID), UNIQUE (DIFFICULTY_LEVEL))
+create table QuizQuestion(id bigint auto_increment ,question_id bigint,quiz_id bigint);
+
+alter table QuizQuestion add foreign key (quiz_id ) references Quiz(id)
+
+alter table QuizQuestion add foreign key (question_id  ) references Question(id)
+create table TEACHER(id bigint primary key auto_increment, first_name varchar(45), last_name varchar(45));
+ALTER TABLE DIFFICULTY  ALTER COLUMN "ID" BIGINT AUTO_INCREMENT 
+create index idx_difficulty_level on DIFFICULTY (id)
