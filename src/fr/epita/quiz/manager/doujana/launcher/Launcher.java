@@ -1,5 +1,6 @@
 package fr.epita.quiz.manager.doujana.launcher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -320,8 +321,8 @@ public class Launcher {
 				question.setTitle(scanner.nextLine());
 				
 				// in here you just enter 0 for very easy, 1 for easy and so on
-				System.out.println("Enter Difficulty level\n" + "\t\t 1 -> Very EasY\n" + "\t\t 2 -> Easy\n" + "\t\t 3 -> Hard\n"
-						+ "\t\t 4 -> Very Hard\n" + "\t\t 5 -> Difficult");
+				System.out.println("Enter Difficulty level\n" + "\t 1 -> Very EasY\n" + "\t 2 -> Easy\n" + "\t 3 -> Hard\n"
+						+ "\t 4 -> Very Hard\n" + "\t 5 -> Difficult");
 				
 				// accept question difficulty level
 				String df_level = scanner.nextLine();
@@ -346,8 +347,23 @@ public class Launcher {
 				question.setDifficulty(df);
 				
 				// accept question type
-				System.out.println("Enter Question type\n" + "\t\t1 -> Open Question\n" + "\t\t2 -> MCQ");
+				System.out.println("Enter Question type\n" + "\t1 -> Open Question\n" + "\t2 -> MCQ");
 				String qType = scanner.nextLine();
+				
+				// accept question topic
+				System.out.println("Enter the Topic associated with Question\n" + "\t1 -> Variables and Constants in Java\n" + "\t2 -> Implmenting Singleton in Java");
+				String qTopic = scanner.nextLine();
+				int qtopic = 0;
+				if (qTopic.equals("1")) {
+					qtopic = 33; // to be retrieved from db
+				} else {
+					qtopic = 34; // to be retrieved from db
+				}
+				question.setQuestion_type_id(qtopic);
+				
+				//create a list of array to accept MCQ choices to be defined
+				System.out.println("Enter the Total MCQ choice options");
+				List<String> mcqChoices = new ArrayList<>();
 				int qt = 0;
 				if ( qType.equals("1")) {
 					qt = 1;
@@ -356,29 +372,69 @@ public class Launcher {
 					// if question type is MCQ, then ask for the number of choices
 					// loop to get the choices 
 					// define the choice which is the correct answer
+					int choiceCount = 0;
+					choiceCount = Integer.parseInt(scanner.nextLine());
+					if(choiceCount <= 0 ) {
+						System.out.println("Enter a numeric value greater than Zero (0)");
+					} else {
+						for(int i = 1; i <= choiceCount; i++) {
+							System.out.println("Enter the Title for choice " + i);
+							String enteredChoice = scanner.nextLine();
+							mcqChoices.add(enteredChoice);
+						}
+					}
 				}
 				question.setQuestion_type_id(qt);
-
-				// accept question topic
-				System.out.println("Enter the Topic associated with Question\n" + "\t\t1 -> Variables and Constants in Java\n" + "\t\t2 -> Implmenting Singleton in Java");
-				String qTopic = scanner.nextLine();
-				int qtopic = 0;
-				if ( qTopic.equals("1")) {
-					qtopic = 33;
-				} else {
-					qtopic = 34;
-				}
-				question.setQuestion_type_id(qtopic);
 				
-				System.out.println("Enter the number of choices you want to make:");
+				/*System.out.println("Enter the number of choices you want to make:");
 				int number = Integer.parseInt(scanner.nextLine());
 				for (int i = 0; i < number; i++) {
 					System.out.println("Enter the choice" + i);
 					mcqchoice.setTitle(scanner.nextLine());
-
-				}
+				}*/
+				
+				//1. save questions
 				questionCreation(question);
+				
+				//2. get question id and set it to the mcqChoice
+				int q_id = getQuestionId(question.getTitle());
 
+				//3. now we save the MCQ choice
+				McqChoice mcq_choice = new McqChoice();
+				McqChoiceJDBCDAO mcqChoiceDAO = new McqChoiceJDBCDAO();
+				for(int i = 0; i < mcqChoices.size(); i++ ) {
+					mcq_choice.setId(q_id);
+					mcq_choice.setTitle(mcqChoices.get(i));
+
+					try {
+						//create the record
+						mcqChoiceDAO.create(mcq_choice);
+					} catch (CreateFailedException e) {
+						quizmanagerlogger.logError("Error occured when adding or creating MCQ choice " + e.getMessage());
+					}
+				}
+				
+				// 3. set the choice from the options as answer
+				System.out.println("Which option from the MCQ Choice is the correct answer?");
+				String correctAnswer = "";
+				for(int j = 1; j <= mcqChoices.size(); j++) {
+					System.out.println("\tEnter " + j + " for " + mcqChoices.get(j) + "\n");
+				}
+				correctAnswer = scanner.nextLine();
+				
+				//4. create or save the MCQ choice answer
+				//4a. get the mcq choice id by title
+				int choice_id = getMCQchoiceAnswerByMCQTitle(correctAnswer);
+				
+				//4b. save the mcq answer
+				McqAnswer answerMCQ = new McqAnswer();
+				answerMCQ.setId(choice_id);
+				McqAnswerJDBCDAO answerMCQJDBC = new McqAnswerJDBCDAO();
+				try {
+					answerMCQJDBC.create(answerMCQ);
+				} catch (CreateFailedException e) {
+					quizmanagerlogger.logError("Error occured when creating MCQ answer " + e.getMessage());
+				}
 				// enter the title
 				break;
 
@@ -465,6 +521,16 @@ public class Launcher {
 			}
 		}
 
+	}
+
+	private static int getMCQchoiceAnswerByMCQTitle(String title) {
+		McqChoiceJDBCDAO mcqChoiceJDBCDAO = new McqChoiceJDBCDAO();
+		return mcqChoiceJDBCDAO.getMCQChoiceAnswerByMCQTitle(title);
+	}
+
+	private static int getQuestionId(String title) {
+		QuestionJDBCDAO questionJDBCDAO = new QuestionJDBCDAO();
+		return questionJDBCDAO.getQuestionIdByTitle(title);
 	}
 
 	private static void createTopic(Topic topic) {

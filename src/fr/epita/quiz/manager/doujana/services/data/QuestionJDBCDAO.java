@@ -15,6 +15,11 @@ import fr.epita.quiz.manager.doujana.exception.CreateFailedException;
 import fr.epita.quiz.manager.doujana.exception.SearchFailedException;
 import fr.epita.quiz.manager.doujana.services.ConfigurationService;
 
+
+/**
+ * @author Doujana
+ * A class that implement the database CRUD operations for Questions
+ */
 public class QuestionJDBCDAO {
 
 	
@@ -23,6 +28,8 @@ public class QuestionJDBCDAO {
 	private static final String INSERT_QUERY = "INSERT into QUESTION (title, question_type_id, topic_id, difficulty_level ) VALUES (?, ?, ?, ?)";
 	private static final String UPDATE_QUERY = "UPDATE QUESTION SET title=?, question_type_id=?, topic_id=?, difficulty_level=? WHERE ID = ?";
 	private static final String DELETE_QUERY = "DELETE FROM question  WHERE id = ?";
+	private static final String SEARCH_QUESTION_BY_TITLE = "SELECT id FROM question WHERE title = ?";
+	
 	private String url;
 	private String password;
 	private String username;
@@ -195,4 +202,28 @@ public int updateRecord(Question question) throws CreateFailedException {
 		return questionList;
 	}
 
+	/**
+	 * This method retrieves the question id from the database by accepting
+	 * the question title as a parameter and returns an integer as the question id
+	 * @param questionTitle
+	 * @return integer of the question id
+	 */
+	public int getQuestionIdByTitle(String questionTitle) {
+		int result = 0;
+		try( Connection conn = getConnection();
+			 PreparedStatement ps = conn.prepareStatement(SEARCH_QUESTION_BY_TITLE)){
+			
+			ps.setString(1, questionTitle);
+			
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt("id");
+			}
+			
+			rs.close();
+		}catch(SQLException sqlEx) {
+			
+		}
+		return result;
+	}
 }

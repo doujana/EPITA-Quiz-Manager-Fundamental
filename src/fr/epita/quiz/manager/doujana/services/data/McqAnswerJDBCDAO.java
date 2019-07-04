@@ -20,6 +20,7 @@ public class McqAnswerJDBCDAO {
 	private static final String INSERT_QUERY = "INSERT into MCQANSWER (title, mcqchoice_id) values(?,?)";
 	private static final String UPDATE_QUERY = "UPDATE mcqanswer SET title=?, mcqchoice_id=? WHERE id = ?";
 	private static final String DELETE_QUERY = "DELETE FROM mcqanswer  WHERE id = ?";
+
 	private String url;
 	private String password;
 	private String username;
@@ -38,9 +39,10 @@ public class McqAnswerJDBCDAO {
 	}
 
 	/**
-	 * Creates a mcq answer  in the database, if a problem occurs then it throws an
-	 * {@link CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new ... try{
-	 * mcqdao.create(mcqanswerInstance); }catch(CreateFailed e){ //log exception }
+	 * Creates a mcq answer in the database, if a problem occurs then it throws an
+	 * {@link CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new
+	 * ... try{ mcqdao.create(mcqanswerInstance); }catch(CreateFailed e){ //log
+	 * exception }
 	 * 
 	 * @param mcqAnswer
 	 * @throws CreateFailedException
@@ -48,22 +50,25 @@ public class McqAnswerJDBCDAO {
 	public void create(McqAnswer mcqAnswer) throws CreateFailedException {
 
 		try (Connection connection = getConnection();
-			
-			PreparedStatement pstmt = connection.prepareStatement(INSERT_QUERY);) {
+
+				PreparedStatement pstmt = connection.prepareStatement(INSERT_QUERY);) {
 			pstmt.setString(1, mcqAnswer.getTitle());
 			pstmt.setInt(2, mcqAnswer.getMcqchoice_id());
-			
+
 			pstmt.execute();
-			
+
 		} catch (SQLException sqle) {
 			throw new CreateFailedException(mcqAnswer);
 		}
 
 	}
+
 	/**
 	 * Updates an mcq answer in the database, if a problem occurs thenit throws an
-	 * {@link  CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new ... try{
-	 * mcqdao.update(mcqanswerInstance); }catch(createFailed e){//log exception}
+	 * {@link CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new
+	 * ... try{ mcqdao.update(mcqanswerInstance); }catch(createFailed e){//log
+	 * exception}
+	 * 
 	 * @param mcqAnswer
 	 * @throws CreateFailedException
 	 */
@@ -71,11 +76,11 @@ public class McqAnswerJDBCDAO {
 	public void update(McqAnswer mcqAnswer) throws CreateFailedException {
 		try (Connection connection = getConnection();
 				PreparedStatement pstmt = connection.prepareStatement(UPDATE_QUERY);) {
-			
+
 			pstmt.setString(1, mcqAnswer.getTitle());
 			pstmt.setInt(2, mcqAnswer.getMcqchoice_id());
 			pstmt.setInt(3, mcqAnswer.getId());
-			
+
 			pstmt.execute();
 		} catch (SQLException sqle) {
 			throw new CreateFailedException(mcqAnswer);
@@ -85,8 +90,10 @@ public class McqAnswerJDBCDAO {
 
 	/**
 	 * Delete an mcq answer in the database, if a problem occurs then it throws an
-	 * {@link  CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new ... try{
-	 * mcqdao.delete(mcqanswerInstance); }catch(createFailed e){//log exception}
+	 * {@link CreateFailedException} usage example: mcqanswerJDBCDAO mcqdao = new
+	 * ... try{ mcqdao.delete(mcqanswerInstance); }catch(createFailed e){//log
+	 * exception}
+	 * 
 	 * @param mcqAnswer
 	 * @throws CreateFailedException
 	 */
@@ -104,10 +111,13 @@ public class McqAnswerJDBCDAO {
 		return null;
 
 	}
+
 	/**
-	 * Searches for  an mcq answer in the database, if a problem occurs then it throws an
-	 * {@link  SearchFailedException} usage example: mcqanswerJDBCDAO mcqdao = new ... try{
-	 * mcqdao.search(mcqanswerInstance); }catch(SearchFailed e){//log exception}
+	 * Searches for an mcq answer in the database, if a problem occurs then it
+	 * throws an {@link SearchFailedException} usage example: mcqanswerJDBCDAO
+	 * mcqdao = new ... try{ mcqdao.search(mcqanswerInstance); }catch(SearchFailed
+	 * e){//log exception}
+	 * 
 	 * @param mcqAnswer
 	 * @throws SearchFailedException
 	 */
@@ -140,4 +150,5 @@ public class McqAnswerJDBCDAO {
 		return mcqanswerList;
 	}
 
+	
 }

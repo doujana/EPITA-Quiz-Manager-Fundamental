@@ -19,6 +19,8 @@ public class McqChoiceJDBCDAO {
 	private static final String INSERT_QUERY = "INSERT into mcqchoise (title, question_id) VALUES (?, ?)";
 	private static final String UPDATE_QUERY = "UPDATE mcqchoise SET title = ?, question_id = ? WHERE id = ?";
 	private static final String DELETE_QUERY = "DELETE FROM mcqchoise  WHERE id = ?";
+	private static final String SEARCH_QUERY_BY_TITLE = "SELECT id FROM mcqanswer WHERE id = ?";
+	
 	private String url;
 	private String password;
 	private String username;
@@ -173,4 +175,24 @@ public class McqChoiceJDBCDAO {
 		return mcqChoiceList;
 	}
 
+	public int getMCQChoiceAnswerByMCQTitle(String title) {
+
+		int id = 0;
+		try (Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement(SEARCH_QUERY_BY_TITLE)) {
+			
+			ps.setString(1, title);
+
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				id = rs.getInt("id");
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			System.out.println("Error getting the MCQ Answer id");
+		}
+
+		return id;
+	}
 }
