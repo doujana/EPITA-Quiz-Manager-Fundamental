@@ -314,7 +314,6 @@ public class Launcher {
 				createTopic(topic);
 				break;
 			case "11":// create question
-				McqChoice mcqchoice = new McqChoice();
 
 				Question question = new Question();
 				System.out.println("Enter Question title");
@@ -990,9 +989,8 @@ public class Launcher {
 			qdao.create(question);
 			System.out.println("question record created successfully!");
 		} catch (CreateFailedException e) {
+			System.out.println("Quiz error " + e.getMessage());
 			quizmanagerlogger.logError("creation Question error");
-
-			e.printStackTrace();
 		}
 	}
 
